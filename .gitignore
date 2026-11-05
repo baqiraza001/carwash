@@ -1,0 +1,6 @@
+/application/config/app-config.php
+/application/logs/
+/uploads/
+/application/vendor/
+/media/
+/modules/clients_staff_handler/uploads/
