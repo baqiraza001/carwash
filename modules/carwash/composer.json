@@ -1,0 +1,5 @@
+{
+    "require": {
+        "sunrise/vin": "^1.1"
+    }
+}

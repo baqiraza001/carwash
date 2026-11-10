@@ -1,0 +1,79 @@
+{
+    "packages": [
+        {
+            "name": "sunrise/vin",
+            "version": "v1.1.3",
+            "version_normalized": "1.1.3.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/sunrise-php/vin.git",
+                "reference": "898f7e62f367eaeba91dea0572337ad85ca3bad4"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/sunrise-php/vin/zipball/898f7e62f367eaeba91dea0572337ad85ca3bad4",
+                "reference": "898f7e62f367eaeba91dea0572337ad85ca3bad4",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^7.1|^8.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "7.5.20|9.5.0",
+                "sunrise/coding-standard": "1.0.0"
+            },
+            "time": "2021-11-30T09:55:22+00:00",
+            "type": "library",
+            "installation-source": "dist",
+            "autoload": {
+                "files": [
+                    "data/manufacturers.php",
+                    "data/regions.php",
+                    "data/years.php"
+                ],
+                "psr-4": {
+                    "Sunrise\\Vin\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Anatoly Fenric",
+                    "email": "anatoly@fenric.ru",
+                    "homepage": "https://anatoly.fenric.ru/"
+                },
+                {
+                    "name": "李昀陞 (Peter)",
+                    "email": "peter279k@gmail.com",
+                    "homepage": "https://github.com/peter279k"
+                },
+                {
+                    "name": "Saud bin Mohammed",
+                    "email": "saud@samaphp.com",
+                    "homepage": "https://github.com/samaphp"
+                }
+            ],
+            "description": "Simple VIN decoder for PHP 7.1+ based on ISO-3779",
+            "homepage": "https://github.com/sunrise-php/vin",
+            "keywords": [
+                "PHP7",
+                "decoder",
+                "fenric",
+                "iso-3779",
+                "php8",
+                "sunrise",
+                "vin"
+            ],
+            "support": {
+                "issues": "https://github.com/sunrise-php/vin/issues",
+                "source": "https://github.com/sunrise-php/vin/tree/v1.1.3"
+            },
+            "install-path": "../sunrise/vin"
+        }
+    ],
+    "dev": true,
+    "dev-package-names": []
+}
