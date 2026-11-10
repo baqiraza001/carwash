@@ -1,0 +1,6 @@
+---
+deployment:
+  tasks:
+    - export DEPLOYPATH=/home/pacarwash/public_html/staging/
+    - /bin/mkdir -p $DEPLOYPATH
+    - /usr/bin/rsync -av --exclude='.git/' --exclude='application/config/app-config.php' --exclude='application/logs/' --exclude='uploads/' --exclude='application/vendor/' --exclude='media/' --exclude='modules/clients_staff_handler/uploads/' ./ $DEPLOYPATH
