@@ -111,3 +111,45 @@ $('#clientid').on('change', function (e) {
         });
     }
 });
+
+/* VERSION: 2026-11-11 07:15 PKT - moved from old (custom) main.js.
+   When an item is added to the invoice preview, merge the item taxes with
+   this client's taxes (carwash/search_client_for_taxes). Stock main.js sets
+   only the item taxes; this listener re-sets the merged list afterwards. */
+$(document).on("item-added-to-preview", function (e) {
+    if (!e.item || e.item_type !== "item") {
+        return;
+    }
+    var clientid = $('#clientid').val();
+    if (!clientid) {
+        return;
+    }
+    var taxSelectedArray = [];
+    function addUniqueTaxes(taxes) {
+        taxes.forEach(function (tax) {
+            if (!taxSelectedArray.includes(tax)) {
+                taxSelectedArray.push(tax);
+            }
+        });
+    }
+    if (e.item.taxname && e.item.taxrate) {
+        addUniqueTaxes([e.item.taxname + '|' + e.item.taxrate]);
+    }
+    if (e.item.taxname_2 && e.item.taxrate_2) {
+        addUniqueTaxes([e.item.taxname_2 + '|' + e.item.taxrate_2]);
+    }
+    var action = admin_url + 'carwash/search_client_for_taxes';
+    $.ajax(action, {
+        type: 'POST',
+        data: { clientid: clientid },
+    }).done(function (data) {
+        var client = JSON.parse(data);
+        var clientTaxes = client.client_taxes ? JSON.parse(client.client_taxes) : [];
+        addUniqueTaxes(clientTaxes);
+        if (taxSelectedArray.length !== 0) {
+            $('.main select.tax').selectpicker('val', taxSelectedArray);
+        } else {
+            $('.main .main-tax').val([]).selectpicker('refresh');
+        }
+    });
+});

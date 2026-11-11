@@ -4,6 +4,26 @@
         <div class="col-md-4">
             <?php $this->load->view('admin/invoice_items/item_select'); ?>
         </div>
+
+        <?php if(get_option('stock_management_active') == '1') { ?>
+            <div class="col-md-3">
+                <?php $stock_suppliers = $this->db->select("id, company")->where('is_deleted', 0)->get('tbl_sm_suppliers')->result_array();
+                $selected = isset($estimate) ? $estimate->stock_supplier : '';
+                ?>
+
+                <div class="form-group mbot25 items-wrapper select-placeholder">
+                    <div class="items-select-wrapper">
+                        <select name="stock_supplier" class="selectpicker no-margin ajax-search" required="true" data-width="false" id="stock_supplier" data-none-selected-text="<?php echo _l('Select Stock Supplier'); ?>">
+                            <option value=""></option>
+                            <?php foreach($stock_suppliers as $stock_supplier) { ?>
+                                <option value="<?php echo $stock_supplier['id'] ?>" <?php if(isset($estimate) && $estimate->stock_supplier == $stock_supplier['id']){echo 'selected';} ?>><?php echo $stock_supplier['company'] ?></option>
+                            <?php } ?>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        <?php } ?>
+
         <div class="col-md-4">
             <div class="form-group mbot25 items-wrapper select-placeholder">
                 <div class="items-select-wrapper">
@@ -13,7 +33,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-8 text-right show_quantity_as_wrapper">
+        <div class="col-md-8 text-right show_quantity_as_wrapper tw-hidden">
             <div class="mtop10">
                 <span><?= _l('show_quantity_as'); ?></span>
                 <div class="radio radio-primary radio-inline">
@@ -111,7 +131,7 @@ if (isset($estimate) && $estimate->show_quantity_as == 2) {
                     <td>
                         <input type="number" name="quantity" min="0" value="1" class="form-control"
                             placeholder="<?= _l('item_quantity_placeholder'); ?>">
-                        <input type="text"
+                        <input type="hidden"
                             placeholder="<?= _l('unit'); ?>"
                             data-toggle="tooltip" 612 data-title="e.q kg, lots, packs" name="unit"
                             class="form-control input-transparent text-right">
