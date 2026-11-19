@@ -94,65 +94,6 @@
                     <input type="hidden" name="new_payers_list" id="new_payers_list" value="">
                 </div>
 
-                <div class="row">
-                    <div class="col-md-12">
-                        <a href="#" class="edit_shipping_billing_info" data-toggle="modal"
-                            data-target="#billing_and_shipping_details"><i class="fa-regular fa-pen-to-square"></i></a>
-                        <?php include_once(APPPATH . 'views/admin/estimates/billing_and_shipping_template.php'); ?>
-                    </div>
-                    <div class="col-md-6">
-                        <p class="bold"><?php echo _l('invoice_bill_to'); ?></p>
-                        <address>
-                            <span class="billing_street">
-                                <?php $billing_street = (isset($estimate) ? $estimate->billing_street : '--'); ?>
-                                <?php $billing_street = ($billing_street == '' ? '--' :$billing_street); ?>
-                                <?php echo process_text_content_for_display($billing_street); ?></span><br>
-                            <span class="billing_city">
-                                <?php $billing_city = (isset($estimate) ? $estimate->billing_city : '--'); ?>
-                                <?php $billing_city = ($billing_city == '' ? '--' :$billing_city); ?>
-                                <?php echo e($billing_city); ?></span>,
-                            <span class="billing_state">
-                                <?php $billing_state = (isset($estimate) ? $estimate->billing_state : '--'); ?>
-                                <?php $billing_state = ($billing_state == '' ? '--' :$billing_state); ?>
-                                <?php echo e($billing_state); ?></span>
-                            <br />
-                            <span class="billing_country">
-                                <?php $billing_country = (isset($estimate) ? get_country_short_name($estimate->billing_country) : '--'); ?>
-                                <?php $billing_country = ($billing_country == '' ? '--' :$billing_country); ?>
-                                <?php echo e($billing_country); ?></span>,
-                            <span class="billing_zip">
-                                <?php $billing_zip = (isset($estimate) ? $estimate->billing_zip : '--'); ?>
-                                <?php $billing_zip = ($billing_zip == '' ? '--' :$billing_zip); ?>
-                                <?php echo e($billing_zip); ?></span>
-                        </address>
-                    </div>
-                    <div class="col-md-6">
-                        <p class="bold"><?php echo _l('ship_to'); ?></p>
-                        <address>
-                            <span class="shipping_street">
-                                <?php $shipping_street = (isset($estimate) ? $estimate->shipping_street : '--'); ?>
-                                <?php $shipping_street = ($shipping_street == '' ? '--' :$shipping_street); ?>
-                                <?php echo process_text_content_for_display($shipping_street); ?></span><br>
-                            <span class="shipping_city">
-                                <?php $shipping_city = (isset($estimate) ? $estimate->shipping_city : '--'); ?>
-                                <?php $shipping_city = ($shipping_city == '' ? '--' :$shipping_city); ?>
-                                <?php echo e($shipping_city); ?></span>,
-                            <span class="shipping_state">
-                                <?php $shipping_state = (isset($estimate) ? $estimate->shipping_state : '--'); ?>
-                                <?php $shipping_state = ($shipping_state == '' ? '--' :$shipping_state); ?>
-                                <?php echo e($shipping_state); ?></span>
-                            <br />
-                            <span class="shipping_country">
-                                <?php $shipping_country = (isset($estimate) ? get_country_short_name($estimate->shipping_country) : '--'); ?>
-                                <?php $shipping_country = ($shipping_country == '' ? '--' :$shipping_country); ?>
-                                <?php echo e($shipping_country); ?></span>,
-                            <span class="shipping_zip">
-                                <?php $shipping_zip = (isset($estimate) ? $estimate->shipping_zip : '--'); ?>
-                                <?php $shipping_zip = ($shipping_zip == '' ? '--' :$shipping_zip); ?>
-                                <?php echo e($shipping_zip); ?></span>
-                        </address>
-                    </div>
-                </div>
                 <?php
                $next_estimate_number = get_option('next_estimate_number');
                $format               = get_option('estimate_number_format');

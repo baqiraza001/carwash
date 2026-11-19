@@ -110,18 +110,6 @@ if (isset($estimate) && $estimate->show_quantity_as == 2) {
                     <td>
                         <textarea name="description" rows="4" class="form-control"
                             placeholder="<?= _l('item_description_placeholder'); ?>"></textarea>
-                        <div class="tw-mt-1.5">
-                            <div class="checkbox checkbox-info">
-                                <input value="1" id="main-optional" type="checkbox" />
-                                <label
-                                    for="main-optional"><?= _l('item_is_optional'); ?></label>
-                            </div>
-                            <div class="checkbox" style="display: none;">
-                                <input value="1" id="main-optional-choosen" type="checkbox" />
-                                <label
-                                    for="main-optional-choosen"><?= _l('item_is_selected'); ?></label>
-                            </div>
-                        </div>
                     </td>
                     <td>
                         <textarea name="long_description" rows="4" class="form-control"
@@ -202,20 +190,6 @@ if (isset($estimate)) {
                         $table_row .= '<input type="hidden" class="order" name="' . $items_indicator . '[' . $i . '][order]">';
                         $table_row .= '</td>';
                         $table_row .= '<td class="bold description"><textarea name="' . $items_indicator . '[' . $i . '][description]" class="form-control" rows="5">' . clear_textarea_breaks($item['description']) . '</textarea>';
-
-                        $table_row .= '<div class="tw-mt-1.5">';
-                        $table_row .= '<div class="checkbox checkbox-info">';
-                        $table_row .= '<input class="optional-item-checkbox" ' . ($item['is_optional'] ? ' checked' : '') . ' value="1" id="' . $i . '-optional" type="checkbox" name="' . $items_indicator . '[' . $i . '][is_optional]" data-index="' . $i . '" />';
-
-                        $table_row .= '<label for="' . $i . '-optional">' . _l('item_is_optional') . '</label>';
-                        $table_row .= '</div>';
-
-                        $table_row .= '<div class="checkbox" style="' . (! ($item['is_optional'] ?? false) ? 'display: none; ' : '') . '">';
-                        $table_row .= '<input class="optional-choose-item-checkbox" ' . ($item['is_selected'] ? ' checked' : '') . ' value="1" id="' . $i . '-optional-choosen" type="checkbox" name="' . $items_indicator . '[' . $i . '][is_selected]" />';
-
-                        $table_row .= '<label for="' . $i . '-optional-choosen">' . _l('item_is_selected') . '</label>';
-                        $table_row .= '</div>';
-                        $table_row .= '</div>';
 
                         $table_row .= '</td>';
                         $table_row .= '<td><textarea name="' . $items_indicator . '[' . $i . '][long_description]" class="form-control" rows="5">' . clear_textarea_breaks($item['long_description']) . '</textarea></td>';

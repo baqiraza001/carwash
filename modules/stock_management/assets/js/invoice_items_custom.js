@@ -124,18 +124,6 @@ function add_item_to_table(data, itemid, merge_invoice, bill_expense) {
       data.description +
       "</textarea>";
 
-    table_row += '<div class="tw-mt-1.5">';
-    table_row += '<div class="checkbox checkbox-info">';
-    table_row += '<input class="optional-item-checkbox" ' + (data.is_optional ? ' checked' : '') + ' value="1" id="' + item_key + '-optional" type="checkbox" name="newitems[' + item_key + '][is_optional]" data-index="' + item_key + '" />';
-    table_row += '<label for="' + item_key + '-optional">' + app.lang.item_is_optional + '</label>';
-    table_row += '</div>';
-
-    table_row += '<div class="checkbox" style="' + (data.is_optional ? '' : 'display: none; ') + '">';
-    table_row += '<input class="optional-choose-item-checkbox" ' + (data.is_selected ? ' checked' : '') + ' value="1" id="' + item_key + '-optional-choosen" type="checkbox" name="newitems[' + item_key + '][is_selected]" />';
-    table_row += '<label for="' + item_key + '-optional-choosen">' + app.lang.item_is_selected + '</label>';
-    table_row += '</div>';
-    table_row += '</div>';
-
     table_row += "</td>";
 
     table_row +=
