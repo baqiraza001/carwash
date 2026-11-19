@@ -1,5 +1,5 @@
 <?php
-// VERSION: 2026-11-10 09:15 PKT - create_item_ajax() now also saves long_description; inventory list newest first (hidden id column)
+// VERSION: 2026-11-19 22:10 PKT - create_item_ajax() now saves the full items-page form (rate, per-currency rates, tax, tax2, unit, group, custom fields); inventory_list() passes taxes/groups/currencies to the view
 defined('BASEPATH') OR exit('No direct script access allowed');
 
 class Stock_products extends AdminController {
@@ -249,6 +249,16 @@ class Stock_products extends AdminController {
             ->get()
             ->result_array();
 
+        $this->load->model('taxes_model');
+        $data['taxes'] = $this->taxes_model->get();
+
+        $this->load->model('invoice_items_model');
+        $data['items_groups'] = $this->invoice_items_model->get_groups();
+
+        $this->load->model('currencies_model');
+        $data['currencies']    = $this->currencies_model->get();
+        $data['base_currency'] = $this->currencies_model->get_base_currency();
+
         $data['title'] = _l('Inventory List');
         $data['module'] = $this->_module;
         $data['permission_module'] = $this->_permission_module;
@@ -425,9 +435,16 @@ class Stock_products extends AdminController {
             return $this->inventory_json_response(false, 'You do not have permission to add items.');
         }
 
+        // Same fields as the items page form - the whole item can be filled
+        // in from the inventory page.
         $description = trim((string) $this->input->post('description'));
         if ($description === '') {
             return $this->inventory_json_response(false, 'Enter an item name.');
+        }
+
+        $rate = $this->input->post('rate');
+        if ($rate === null || $rate === '' || !is_numeric($rate)) {
+            return $this->inventory_json_response(false, 'Enter the item rate.');
         }
 
         // Same item already exists - select it instead of creating a duplicate.
@@ -442,17 +459,46 @@ class Stock_products extends AdminController {
 
         $data = [
             'description' => $description,
+            'rate'        => (float) $rate,
             'group_id'    => 0,
         ];
-
-        $rate = $this->input->post('rate');
-        if ($rate !== null && $rate !== '' && is_numeric($rate)) {
-            $data['rate'] = (float) $rate;
-        }
 
         $long_description = trim((string) $this->input->post('long_description', TRUE));
         if ($long_description !== '') {
             $data['long_description'] = $long_description;
+        }
+
+        $tax = $this->input->post('tax');
+        if ($tax !== null && $tax !== '' && is_numeric($tax)) {
+            $data['tax'] = (int) $tax;
+        }
+
+        $tax2 = $this->input->post('tax2');
+        if ($tax2 !== null && $tax2 !== '' && is_numeric($tax2)) {
+            $data['tax2'] = (int) $tax2;
+        }
+
+        $unit = trim((string) $this->input->post('unit'));
+        if ($unit !== '') {
+            $data['unit'] = $unit;
+        }
+
+        $group_id = $this->input->post('group_id');
+        if ($group_id !== null && $group_id !== '' && is_numeric($group_id)) {
+            $data['group_id'] = (int) $group_id;
+        }
+
+        // Per-currency rates (rate_currency_N) - the items model creates
+        // the column on tblitems when it does not exist yet.
+        foreach ((array) $this->input->post() as $key => $value) {
+            if (strpos($key, 'rate_currency_') === 0 && $value !== '' && is_numeric($value)) {
+                $data[$key] = (float) $value;
+            }
+        }
+
+        $custom_fields = $this->input->post('custom_fields');
+        if (is_array($custom_fields)) {
+            $data['custom_fields'] = $custom_fields;
         }
 
         $this->load->model('invoice_items_model');
@@ -462,7 +508,7 @@ class Stock_products extends AdminController {
             return $this->inventory_json_response(false, 'The item could not be added.');
         }
 
-        return $this->inventory_json_response(true, 'Item added.', [
+        return $this->inventory_json_response(true, 'Item added. Appears is list only when stock is added.', [
             'id'          => (int) $id,
             'description' => $description,
             'existed'     => false,

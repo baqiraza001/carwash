@@ -1,4 +1,5 @@
 <?php defined('BASEPATH') or exit('No direct script access allowed'); ?>
+<?php // VERSION: 2026-11-19 22:20 PKT - fix double save: Save button is type=button, one saveNewItem() path for click + Enter, in-flight guard disables the button during the request ?>
 <?php init_head(); ?>
 <div id="wrapper">
     <div class="content">
@@ -137,16 +138,61 @@
         <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
                 <h4 class="modal-title">Add New Item</h4>
       </div>
+      <?php echo form_open('', ['id' => 'new_item_form']); ?>
             <div class="modal-body">
-                    <?php echo render_input('new_item_description', 'Item Name', '', 'text', ['id' => 'new_item_description']); ?>
-                    <?php echo render_input('new_item_rate', 'Rate', '', 'number', ['id' => 'new_item_rate', 'min' => '0', 'step' => '0.01']); ?>
-                    <?php echo render_textarea('new_item_long_description', 'Description', '', ['id' => 'new_item_long_description', 'rows' => 3]); ?>
-                    <p class="text-muted">The item will be added to your items and will be visible in the inentory list only when inventory is added for that item.</p>
+                    <?php echo render_input('description', 'invoice_item_add_edit_description', '', 'text', ['id' => 'new_item_description']); ?>
+                    <?php echo render_textarea('long_description', 'invoice_item_long_description', '', ['id' => 'new_item_long_description']); ?>
+                    <div class="form-group">
+                        <label for="rate" class="control-label">
+                            <?php echo _l('invoice_item_add_edit_rate_currency', e($base_currency->name) . ' <small>(' . _l('base_currency_string') . ')</small>'); ?></label>
+                        <input type="number" id="new_item_rate" name="rate" class="form-control" value="">
+                    </div>
+                    <?php foreach ($currencies as $currency) {
+                        if ($currency['isdefault'] == 0 && total_rows(db_prefix() . 'clients', ['default_currency' => $currency['id']]) > 0) { ?>
+                    <div class="form-group">
+                        <label for="rate_currency_<?php echo e($currency['id']); ?>" class="control-label">
+                            <?php echo e(_l('invoice_item_add_edit_rate_currency', $currency['name'])); ?></label>
+                        <input type="number" id="rate_currency_<?php echo e($currency['id']); ?>" name="rate_currency_<?php echo e($currency['id']); ?>" class="form-control" value="">
+                    </div>
+                    <?php }
+                    } ?>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="control-label" for="tax"><?php echo _l('tax_1'); ?></label>
+                                <select class="selectpicker display-block" data-width="100%" name="tax" id="new_item_tax" data-none-selected-text="<?php echo _l('no_tax'); ?>">
+                                    <option value=""></option>
+                                    <?php foreach ($taxes as $tax) { ?>
+                                    <option value="<?php echo e($tax['id']); ?>" data-subtext="<?php echo e($tax['name']); ?>"><?php echo e($tax['taxrate']); ?>%</option>
+                                    <?php } ?>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="control-label" for="tax2"><?php echo _l('tax_2'); ?></label>
+                                <select class="selectpicker display-block" disabled data-width="100%" name="tax2" id="new_item_tax2" data-none-selected-text="<?php echo _l('no_tax'); ?>">
+                                    <option value=""></option>
+                                    <?php foreach ($taxes as $tax) { ?>
+                                    <option value="<?php echo e($tax['id']); ?>" data-subtext="<?php echo e($tax['name']); ?>"><?php echo e($tax['taxrate']); ?>%</option>
+                                    <?php } ?>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="clearfix mbot15"></div>
+                    <?php echo render_input('unit', 'unit', '', 'text', ['id' => 'new_item_unit']); ?>
+                    <div id="custom_fields_items">
+                        <?php echo render_custom_fields('items'); ?>
+                    </div>
+                    <?php echo render_select('group_id', $items_groups, ['id', 'name'], 'item_group', '', ['id' => 'new_item_group_id']); ?>
+                    <p class="text-muted">The item will be added to your items and will be visible in the inventory list only when inventory is added for that item.</p>
       </div>
       <div class="modal-footer">
         <button class="btn btn-default" data-dismiss="modal">Close</button>
-                <button class="btn btn-primary" id="saveNewItemBtn">Save</button>
+                <button type="button" class="btn btn-primary" id="saveNewItemBtn">Save</button>
       </div>
+      <?php echo form_close(); ?>
     </div>
   </div>
 </div>
@@ -276,24 +322,39 @@ $('#saveInventoryItemBtn').on('click', function() {
     });
 });
 
-// Add New Item from the Inventory page - no need to leave for the items page.
+// Add New Item from the Inventory page - the full items-page form, no need
+// to leave for the items page.
 $('#add_new_item_btn, #add_new_item_header_btn').on('click', function() {
-    $('#new_item_description, #new_item_rate, #new_item_long_description').val('');
+    var form = $('#new_item_form');
+    if (form.length) {
+        form[0].reset();
+        form.find('select').selectpicker('val', '').selectpicker('refresh');
+    }
+    $('#new_item_tax2').prop('disabled', true).selectpicker('refresh');
     $('#newItemModal').modal('show');
 });
 
-$('#saveNewItemBtn').on('click', function() {
+// One save path only - the click handler and the form submit handler both
+// call saveNewItem(), and the in-flight guard stops a second request.
+var newItemSaving = false;
+function saveNewItem() {
+    if (newItemSaving) {
+        return;
+    }
     var description = $.trim($('#new_item_description').val());
     if (!description) {
         alert_float('warning', 'Enter an item name.');
         return;
     }
+    var rate = $('#new_item_rate').val();
+    if (rate === '' || rate === null || isNaN(Number(rate))) {
+        alert_float('warning', 'Enter the item rate.');
+        return;
+    }
 
-    $.post(admin_url + 'stock_management/stock_products/create_item_ajax', {
-        description: description,
-        rate: $('#new_item_rate').val(),
-        long_description: $('#new_item_long_description').val()
-    })
+    newItemSaving = true;
+    $('#saveNewItemBtn').prop('disabled', true);
+    $.post(admin_url + 'stock_management/stock_products/create_item_ajax', $('#new_item_form').serialize())
     .done(function(response) {
         var result = response;
         if (typeof response === 'string') {
@@ -320,7 +381,17 @@ $('#saveNewItemBtn').on('click', function() {
         $('#newItemModal').modal('hide');
     }).fail(function() {
         alert_float('danger', 'Something went wrong while adding the item.');
+    }).always(function() {
+        newItemSaving = false;
+        $('#saveNewItemBtn').prop('disabled', false);
     });
+}
+
+$('#saveNewItemBtn').on('click', saveNewItem);
+
+$('#new_item_form').on('submit', function(e) {
+    e.preventDefault();
+    saveNewItem();
 });
 
 $(document).on('click', '.inventory-delete', function() {
