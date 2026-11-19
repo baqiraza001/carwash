@@ -508,7 +508,7 @@ class Stock_products extends AdminController {
             return $this->inventory_json_response(false, 'The item could not be added.');
         }
 
-        return $this->inventory_json_response(true, 'Item added. Appears is list only when stock is added.', [
+        return $this->inventory_json_response(true, 'Item added. Appears in list only when stock is added.', [
             'id'          => (int) $id,
             'description' => $description,
             'existed'     => false,
