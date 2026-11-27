@@ -26,11 +26,16 @@ foreach ($rResult as $aRow) {
     $row[] = $aRow['description'];
     $row[] = !empty($aRow['created_on']) ? _dt($aRow['created_on']) : '-';
 
-    $actions = '';
-    $actions .= '<a href="#" class="btn btn-primary btn-icon edit_term_condition" data-id="' . $aRow['id'] . '" type="button"><i class="fa-regular fa-pen-to-square"></i></a>';
-    $actions .= '<a href="#" class="btn btn-danger btn-icon delete_term_condition" data-id="' . $aRow['id'] . '" type="button"><i class="fa-solid fa-xmark"></i></a>';
+    $options = "";
+    if (is_admin()) {
+        $options .= icon_btn('#', 'fa-regular fa-pen-to-square', 'btn-default edit_term_condition', ['data-id' => $aRow['id']]);
+    }
 
-    $row[] = $actions;
+    if (is_admin()) {
+        $options .= icon_btn('#', 'fa-solid fa-xmark', 'btn-danger delete_term_condition', ['data-id' => $aRow['id']]);
+    }
+
+    $row[] = $options;
 
     $row['DT_RowClass'] = 'has-row-options';
     $output['aaData'][] = $row;

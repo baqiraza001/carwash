@@ -116,7 +116,7 @@ function carwash_admin_init()
             'children' => [
                 [
                     'name'     => _l('carwash_terms_and_conditions'),
-                    'view'     => 'carwash/terms_conditions_settings_tab',
+                    'view'     => 'carwash/terms_conditions_settings',
                     'icon'     => 'fa fa-file-text-o menu-icon',
                     'position' => 1,
                 ],
@@ -141,7 +141,7 @@ function carwash_load_settings_js()
         return;
     }
 
-    if ($CI->input->get('group') !== 'carwash_terms_conditions_settings') {
+    if ($CI->input->get('group') !== 'terms_conditions_settings') {
         return;
     }
 
